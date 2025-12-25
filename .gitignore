@@ -15,10 +15,7 @@ out/
 .DS_Store
 Thumbs.db
 
-### App Configs ###
-*.env
-*.local
-*.secret
+
 
 ### Java ###
 *.class
