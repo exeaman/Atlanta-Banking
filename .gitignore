@@ -15,7 +15,14 @@ out/
 .DS_Store
 Thumbs.db
 
-
+### App Configs ###
+*.env
+*.local
+*.secret
 
 ### Java ###
 *.class
+
+# Allow base Spring config
+!application.properties
+!**/application.properties
