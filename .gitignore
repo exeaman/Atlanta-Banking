@@ -1,0 +1,24 @@
+### IDE ###
+.vscode/
+.idea/
+*.iml
+
+### Build ###
+target/
+build/
+out/
+
+### Logs ###
+*.log
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### App Configs ###
+*.env
+*.local
+*.secret
+
+### Java ###
+*.class
