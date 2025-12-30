@@ -60,7 +60,7 @@ public class Customer {
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private KycStatus kycStatus;
+    private KycStatus kycStatus ;
 
     @NotNull
     private Boolean isActive;

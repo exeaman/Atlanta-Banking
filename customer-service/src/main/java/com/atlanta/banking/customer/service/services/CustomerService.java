@@ -13,4 +13,5 @@ public interface CustomerService {
     void deactivateCustomer(UUID customerId);
     boolean customerExists(UUID customerId);
     CustomerResponseDto activateCustomer(UUID customerId);
+    void updateKycStatus(UUID customerId);
 }
