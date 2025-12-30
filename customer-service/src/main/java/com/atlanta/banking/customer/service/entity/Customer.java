@@ -35,7 +35,7 @@ public class Customer {
 
     @NotBlank
     @Size(min = 7, max = 20)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 20, unique = true)
     private String phoneNumber;
 
     @NotNull
