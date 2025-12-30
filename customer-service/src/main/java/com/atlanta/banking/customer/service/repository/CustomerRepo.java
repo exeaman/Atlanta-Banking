@@ -1,5 +1,6 @@
 package com.atlanta.banking.customer.service.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,6 @@ import com.atlanta.banking.customer.service.entity.Customer;
 
 @Repository
 public interface CustomerRepo extends JpaRepository<Customer,UUID>{
-    Customer getCustomerByEmail(String email);
-    Customer getCustomerByPhoneNumber(String phoneNumber);
+    Optional<Customer> findByEmail(String email);
+    Optional<Customer> findByPhoneNumber(String phoneNumber);
 }
