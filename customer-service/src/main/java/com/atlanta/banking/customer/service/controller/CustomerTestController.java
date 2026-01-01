@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/customer")
 public class CustomerTestController {
 @GetMapping("/health")
-    public ResponseEntity<Void> getCustomerHealth(){
-        return new ResponseEntity<>(HttpStatusCode.valueOf(200));
+    public ResponseEntity<String> getCustomerHealth(){
+        return new ResponseEntity<>("Customer API working!",HttpStatusCode.valueOf(200));
     }
 }

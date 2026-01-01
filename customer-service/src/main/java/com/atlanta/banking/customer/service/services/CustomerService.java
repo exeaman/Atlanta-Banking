@@ -1,5 +1,6 @@
 package com.atlanta.banking.customer.service.services;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.atlanta.banking.customer.service.dto.CustomerRequestDto;
@@ -16,4 +17,6 @@ public interface CustomerService {
     boolean customerExists(UUID customerId);
     String activateCustomer(UUID customerId);
     String updateKycStatus(UUID customerId, KycStatus kycStatus);
+
+    List<CustomerResponseDto> getAllCustomers();
 }
