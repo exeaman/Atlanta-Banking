@@ -1,6 +1,8 @@
 package com.atlanta.banking.customer.service.services.implementation;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
-    CustomerRepo customerRepo;
-    ModelMapper modelMapper;
+    private final CustomerRepo customerRepo;
+    private final ModelMapper modelMapper;
 
     @Override
     public CustomerResponseDto createCustomer(CustomerRequestDto customerRequest) {
@@ -110,4 +112,13 @@ public class CustomerServiceImpl implements CustomerService {
                         CustomerResponseDto.class);
     }
 
+    @Override
+    public List<CustomerResponseDto> getAllCustomers() {
+        List<Customer> customers = customerRepo.findAll();
+        if (customers.isEmpty())
+            throw new InvalidCustomerStateException("No customer data present.");
+        return customers.stream()
+                .map(c -> modelMapper.map(c, CustomerResponseDto.class))
+                .collect(Collectors.toList());
+    }
 }
