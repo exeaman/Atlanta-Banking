@@ -1,4 +1,3 @@
-
 package com.atlanta.banking.customer.service.exception;
 
 import java.time.Instant;
@@ -13,7 +12,6 @@ import com.atlanta.banking.customer.service.dto.CustomExceptionResponseDto;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(CustomerNotFoundException.class)
     public ResponseEntity<CustomExceptionResponseDto> customerNotFoundHandler(CustomerNotFoundException e) {
         CustomExceptionResponseDto ex = new CustomExceptionResponseDto();
@@ -55,9 +53,7 @@ public class GlobalExceptionHandler {
         CustomExceptionResponseDto ex = new CustomExceptionResponseDto();
         ex.setDate(Instant.now().toString());
         ex.setDesc(e.getMessage());
-        ex.setExceptionName(e.getMessage());
+        ex.setExceptionName("Internal server error.");
         return ResponseEntity.status(HttpStatusCode.valueOf(500)).body(ex);
     }
-
-    
 }

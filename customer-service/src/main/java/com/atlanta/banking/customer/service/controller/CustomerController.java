@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +18,6 @@ import com.atlanta.banking.customer.service.dto.CustomerResponseDto;
 import com.atlanta.banking.customer.service.services.implementation.CustomerServiceImpl;
 import com.atlanta.banking.customer.service.utils.KycStatus;
 
-import ch.qos.logback.core.model.processor.PhaseIndicator;
-import jakarta.ws.rs.Path;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -61,8 +58,8 @@ public class CustomerController {
         return new ResponseEntity<>(customerServiceImpl.getCustomerByEmail(email), HttpStatus.OK);
     }
 
-    @PutMapping("/update-kyc")
-    public ResponseEntity<String> updateKyc(@RequestBody String customerId, @RequestBody KycStatus kycStatus) {
+    @PutMapping("/update-kyc/{customerId}")
+    public ResponseEntity<String> updateKyc(@PathVariable String customerId, @RequestBody KycStatus kycStatus) {
         return new ResponseEntity<>(customerServiceImpl.updateKycStatus(UUID.fromString(customerId), kycStatus),
                 HttpStatus.OK);
     }
