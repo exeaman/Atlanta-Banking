@@ -56,13 +56,13 @@ public class Account {
     private Instant updatedAt;
 
     @PrePersist
-    protected void onCreate(){
+    protected void onCreate() {
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
 
     @PreUpdate
-    protected void onUpdate(){
+    protected void onUpdate() {
         this.updatedAt = Instant.now();
     }
 }
