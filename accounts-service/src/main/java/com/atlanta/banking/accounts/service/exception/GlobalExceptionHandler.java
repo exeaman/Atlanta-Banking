@@ -61,9 +61,8 @@ public class GlobalExceptionHandler {
         dto.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
         dto.setDate(LocalDate.now().toString());
         dto.setTime(LocalTime.now().toString());
-        dto.setMessage("An unexpected error occurred. Please try again later.");
+        dto.setMessage(e.getMessage());
         dto.setException("Internal Server Error");
         return new ResponseEntity<>(dto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }

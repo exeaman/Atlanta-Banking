@@ -15,6 +15,7 @@ import com.atlanta.banking.accounts.service.dto.AccountCreationRequestDto;
 import com.atlanta.banking.accounts.service.dto.AccountResponseDto;
 import com.atlanta.banking.accounts.service.entity.Account;
 import com.atlanta.banking.accounts.service.entity.AccountCustomerMap;
+import com.atlanta.banking.accounts.service.exception.AccountDuplicacyException;
 import com.atlanta.banking.accounts.service.exception.AccountNotFoundException;
 import com.atlanta.banking.accounts.service.exception.InvalidAccountStateException;
 import com.atlanta.banking.accounts.service.exception.InvalidCustomerException;
@@ -24,9 +25,11 @@ import com.atlanta.banking.accounts.service.services.AccountNumberSequenceGenera
 import com.atlanta.banking.accounts.service.services.AccountService;
 import com.atlanta.banking.accounts.service.services.UserIdSequenceGeneratorService;
 import com.atlanta.banking.accounts.service.utils.AccountStatus;
+import com.atlanta.banking.accounts.service.utils.AccountType;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.var;
 
 @Service
 @RequiredArgsConstructor
@@ -43,10 +46,11 @@ public class AccountServiceImplementation implements AccountService {
     @Transactional
     public AccountResponseDto openAccount(AccountCreationRequestDto accountCreationRequestDto) {
 
-        if (validateCustomer(accountCreationRequestDto.getCustomerId().toString()))
+        if (!validateCustomer(accountCreationRequestDto.getCustomerId().toString()))
             throw new InvalidCustomerException(
                     "No customer found with ID " + accountCreationRequestDto.getCustomerId().toString());
 
+        if (!canOpen(accountCreationRequestDto.getCustomerId(), accountCreationRequestDto.getAccountType()))    throw new AccountDuplicacyException("A "+ accountCreationRequestDto.getAccountType().toString()+" account already exists with customer ID :"+accountCreationRequestDto.getCustomerId());
         // Account Entity Object
         Account account = new Account();
 
@@ -92,6 +96,8 @@ public class AccountServiceImplementation implements AccountService {
         for (String userId : allUserIds) {
             accountsByCustomerId.add(mapper.map(accountRepo.findByUserId(userId), AccountResponseDto.class));
         }
+        if (accountsByCustomerId.isEmpty())
+            throw new AccountNotFoundException("No accounts exists with customer ID :" + customerId);
         return accountsByCustomerId;
     }
 
@@ -99,7 +105,7 @@ public class AccountServiceImplementation implements AccountService {
     public void freezeAccount(String accountNumber) {
         Account account = getAccount(accountNumber);
 
-        if (account.getAccountStatus() != AccountStatus.FROZEN) {
+        if (account.getAccountStatus() == AccountStatus.FROZEN || account.getAccountStatus() == AccountStatus.CLOSED) {
             throw new InvalidAccountStateException(
                     "Account is already " + account.getAccountStatus().toString() + " " + accountNumber);
         }
@@ -182,4 +188,13 @@ public class AccountServiceImplementation implements AccountService {
                 .orElseThrow(() -> new AccountNotFoundException("No account exists with the number " + accountNumber));
     }
 
+    private Boolean canOpen(UUID customerId, AccountType accountType) {
+        List<AccountResponseDto> accounts = getAccountByCustomerId(customerId.toString());
+
+        for (AccountResponseDto acc : accounts) {
+            if (acc.getAccountType() == accountType)
+                return false;
+        }
+        return true;
+    }
 }

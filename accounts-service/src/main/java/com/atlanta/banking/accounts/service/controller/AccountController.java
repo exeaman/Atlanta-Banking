@@ -25,18 +25,18 @@ import lombok.RequiredArgsConstructor;
 public class AccountController {
     private final AccountServiceImplementation accountService;
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<AccountResponseDto> createAccount(
             @RequestBody AccountCreationRequestDto accountCreationRequestDto) {
         return new ResponseEntity<>(accountService.openAccount(accountCreationRequestDto), HttpStatus.OK);
     }
 
-    @GetMapping("/{accountNumber}")
+    @GetMapping("/byaccnumber/{accountNumber}")
     public ResponseEntity<AccountResponseDto> getAccount(@PathVariable String accountNumber) {
         return new ResponseEntity<>(accountService.getAccountByAccountNumber(accountNumber), HttpStatus.OK);
     }
 
-    @GetMapping("/{customerId}")
+    @GetMapping("/bycustomerid/{customerId}")
     public ResponseEntity<List<AccountResponseDto>> getAccountById(@PathVariable String customerId) {
         return new ResponseEntity<>(accountService.getAccountByCustomerId(customerId), HttpStatus.OK);
 
@@ -61,7 +61,7 @@ public class AccountController {
     }
 
     @PutMapping("/debit/{accountNumber}")
-    public ResponseEntity<Void> debit(@PathVariable String accountNumber, BigDecimal amount) {
+    public ResponseEntity<Void> debit(@PathVariable String accountNumber, @RequestBody BigDecimal amount) {
         accountService.debit(accountNumber, amount);
         return ResponseEntity.ok().build();
     }
