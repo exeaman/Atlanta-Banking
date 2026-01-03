@@ -27,4 +27,6 @@ public interface AccountService {
     Boolean isAccountActive(String accountNumber);
 
     BigDecimal getBalance(String accountNumber);
+
+    Boolean validateCustomer(String customerId);
 }

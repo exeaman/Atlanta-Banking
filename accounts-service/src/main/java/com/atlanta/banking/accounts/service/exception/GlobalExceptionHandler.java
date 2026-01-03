@@ -44,6 +44,16 @@ public class GlobalExceptionHandler {
         dto.setException("Invalid Account State Exception");
         return new ResponseEntity<>(dto, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(InvalidCustomerException.class)
+    public ResponseEntity<AccountExceptionDto> invalidAccountStateException(InvalidCustomerException e) {
+        AccountExceptionDto dto = new AccountExceptionDto();
+        dto.setCode(HttpStatus.CONFLICT.toString());
+        dto.setDate(LocalDate.now().toString());
+        dto.setTime(LocalTime.now().toString());
+        dto.setMessage(e.getMessage());
+        dto.setException("Invalid Customer Exception");
+        return new ResponseEntity<>(dto, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<AccountExceptionDto> handleGenericException(Exception e) {
