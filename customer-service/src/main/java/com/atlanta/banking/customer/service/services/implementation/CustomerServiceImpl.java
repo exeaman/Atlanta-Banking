@@ -37,8 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponseDto getCustomerById(UUID customerId) {
         return modelMapper
-                .map(customerRepo.findById(customerId)
-                        .orElseThrow(() -> new CustomerNotFoundException("No customer with such ID exists.")),
+                .map(getCustomer(customerId),
                         CustomerResponseDto.class);
     }
 
@@ -52,16 +51,14 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDto updateCustomer(UUID customerId, CustomerRequestDto customerRequest) {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("No customer with such ID exists."));
+        Customer customer = getCustomer(customerId);
         modelMapper.map(customerRequest, customer);
         return modelMapper.map(customerRepo.save(customer), CustomerResponseDto.class);
     }
 
     @Override
     public String deactivateCustomer(UUID customerId) {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("No customer with such ID exists."));
+        Customer customer = getCustomer(customerId);
 
         customer.setIsActive(false);
 
@@ -77,8 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String activateCustomer(UUID customerId) {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("No customer with such ID exists."));
+        Customer customer = getCustomer(customerId);
 
         if (customer.getIsActive())
             throw new InvalidCustomerStateException("Customer is already active.");
@@ -92,8 +88,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public String updateKycStatus(UUID customerId, KycStatus kycStatus) {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new CustomerNotFoundException("No customer with such ID exists."));
+        Customer customer = getCustomer(customerId);
 
         if (customer.getKycStatus() == kycStatus)
             throw new InvalidCustomerStateException("Customer's KYC is already " + kycStatus.toString());
@@ -120,5 +115,9 @@ public class CustomerServiceImpl implements CustomerService {
         return customers.stream()
                 .map(c -> modelMapper.map(c, CustomerResponseDto.class))
                 .collect(Collectors.toList());
+    }
+
+    private Customer getCustomer(UUID customerId){
+        return getCustomer(customerId);
     }
 }

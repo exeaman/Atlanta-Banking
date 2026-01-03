@@ -11,5 +11,5 @@ import com.atlanta.banking.accounts.service.entity.AccountCustomerMap;
 public interface AccountCustomerMapRepository extends JpaRepository<AccountCustomerMap,UUID>{
     Optional<AccountCustomerMap> findByUserId(String userId);
     Optional<AccountCustomerMap> findByAccountNumber(String accountNumber);
-    List<AccountCustomerMap> findByCustomerId(UUID customerId);
+    List<AccountCustomerMap> findAllByCustomerId(UUID customerId);
 }

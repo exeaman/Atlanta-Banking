@@ -2,7 +2,6 @@ package com.atlanta.banking.accounts.service.services;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import com.atlanta.banking.accounts.service.dto.AccountCreationRequestDto;
 import com.atlanta.banking.accounts.service.dto.AccountResponseDto;
@@ -12,7 +11,7 @@ public interface AccountService {
 
     AccountResponseDto getAccountByAccountNumber(String accountNumber);
 
-    List<AccountResponseDto> getAccountByCustomerId(UUID customerId);
+    List<AccountResponseDto> getAccountByCustomerId(String customerId);
 
     void freezeAccount(String accountNumber);
 

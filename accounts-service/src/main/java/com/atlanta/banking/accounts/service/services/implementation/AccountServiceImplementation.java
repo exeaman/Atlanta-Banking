@@ -1,6 +1,7 @@
 package com.atlanta.banking.accounts.service.services.implementation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import com.atlanta.banking.accounts.service.dto.AccountResponseDto;
 import com.atlanta.banking.accounts.service.entity.Account;
 import com.atlanta.banking.accounts.service.entity.AccountCustomerMap;
 import com.atlanta.banking.accounts.service.exception.AccountNotFoundException;
+import com.atlanta.banking.accounts.service.exception.InvalidAccountStateException;
 import com.atlanta.banking.accounts.service.exception.InvalidCustomerException;
 import com.atlanta.banking.accounts.service.repository.AccountCustomerMapRepository;
 import com.atlanta.banking.accounts.service.repository.AccountRepository;
@@ -75,62 +77,109 @@ public class AccountServiceImplementation implements AccountService {
     @Override
     public AccountResponseDto getAccountByAccountNumber(String accountNumber) {
         return mapper.map(
-                accountRepo.findByAccountNumber(accountNumber).orElseThrow(
-                        () -> new AccountNotFoundException("No account with such number exists " + accountNumber)),
+                getAccount(accountNumber),
                 AccountResponseDto.class);
     }
 
     @Override
-    public List<AccountResponseDto> getAccountByCustomerId(UUID customerId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAccountByCustomerId'");
+    public List<AccountResponseDto> getAccountByCustomerId(String customerId) {
+        if (!validateCustomerFien.validateCustomer(customerId))
+            throw new InvalidCustomerException(
+                    "No customer found with ID " + customerId);
+        List<String> allUserIds = accMapRepo.findAllByCustomerId(UUID.fromString(customerId)).stream()
+                .map(e -> e.getUserId()).toList();
+        List<AccountResponseDto> accountsByCustomerId = new ArrayList<>();
+        for (String userId : allUserIds) {
+            accountsByCustomerId.add(mapper.map(accountRepo.findByUserId(userId), AccountResponseDto.class));
+        }
+        return accountsByCustomerId;
     }
 
     @Override
     public void freezeAccount(String accountNumber) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'freezeAccount'");
+        Account account = getAccount(accountNumber);
+
+        if (account.getAccountStatus() != AccountStatus.FROZEN) {
+            throw new InvalidAccountStateException(
+                    "Account is already " + account.getAccountStatus().toString() + " " + accountNumber);
+        }
+        account.setAccountStatus(AccountStatus.FROZEN);
+        account.setIsActive(false);
+        accountRepo.save(account);
+
     }
 
     @Override
     public void unFreezeAccount(String accountNumber) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'unFreezeAccount'");
+        Account account = getAccount(accountNumber);
+
+        if (account.getAccountStatus() == AccountStatus.ACTIVE) {
+            throw new InvalidAccountStateException(
+                    "Account is already " + account.getAccountStatus().toString() + " " + accountNumber);
+        }
+        account.setAccountStatus(AccountStatus.ACTIVE);
+        account.setIsActive(true);
+        accountRepo.save(account);
     }
 
     @Override
     public void closeAccount(String accountNumber) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'closeAccount'");
+        Account account = getAccount(accountNumber);
+
+        if (account.getAccountStatus() == AccountStatus.CLOSED)
+            throw new InvalidAccountStateException("Account is already closed " + accountNumber);
+
+        account.setAccountStatus(AccountStatus.CLOSED);
+        account.setIsActive(false);
+        accountRepo.save(account);
     }
 
     @Override
     public void credit(String accountNumber, BigDecimal amount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'credit'");
+        Account account = getAccount(accountNumber);
+
+        if (account.getIsActive()) {
+            BigDecimal balance = account.getBalance();
+            balance = balance.add(amount);
+            account.setBalance(balance);
+        }
+
+        accountRepo.save(account);
     }
 
     @Override
     public void debit(String accountNumber, BigDecimal amount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'debit'");
+        Account account = getAccount(accountNumber);
+
+        if (account.getIsActive()) {
+            BigDecimal balance = account.getBalance();
+            if (balance.compareTo(amount) < 0)
+                throw new InvalidAccountStateException("Insufficient Funds in account " + accountNumber);
+            balance = balance.subtract(amount);
+            account.setBalance(balance);
+        }
+
+        accountRepo.save(account);
     }
 
     @Override
     public Boolean isAccountActive(String accountNumber) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isAccountActive'");
+        return getAccount(accountNumber).getIsActive();
     }
 
     @Override
     public BigDecimal getBalance(String accountNumber) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getBalance'");
+        return getAccount(accountNumber).getBalance();
     }
 
     @Override
     public Boolean validateCustomer(String customerId) {
         return validateCustomerFien.validateCustomer(customerId);
+    }
+
+    private Account getAccount(String accountNumber) {
+        return accountRepo.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountNotFoundException("No account exists with the number " + accountNumber));
     }
 
 }
