@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.atlanta.banking.customer.service.dto.CustomExceptionResponseDto;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
 @RestControllerAdvice
+@Hidden
 public class GlobalExceptionHandler {
     @ExceptionHandler(CustomerNotFoundException.class)
     public ResponseEntity<CustomExceptionResponseDto> customerNotFoundHandler(CustomerNotFoundException e) {

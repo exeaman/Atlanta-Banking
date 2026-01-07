@@ -1,5 +1,7 @@
 package com.atlanta.banking.customer.service.services.implementation;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -12,6 +14,7 @@ import com.atlanta.banking.customer.service.dto.CustomerResponseDto;
 import com.atlanta.banking.customer.service.entity.Customer;
 import com.atlanta.banking.customer.service.exception.CustomerNotFoundException;
 import com.atlanta.banking.customer.service.exception.InvalidCustomerStateException;
+import com.atlanta.banking.customer.service.exception.UnderAgeCustomerException;
 import com.atlanta.banking.customer.service.repository.CustomerRepo;
 import com.atlanta.banking.customer.service.services.CustomerService;
 import com.atlanta.banking.customer.service.utils.KycStatus;
@@ -27,6 +30,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDto createCustomer(CustomerRequestDto customerRequest) {
+        if (Period.between(customerRequest.getDateOfBirth(), LocalDate.now()).getYears() < 18)
+            throw new UnderAgeCustomerException("Customer must be atleast 18 years old.");
         return modelMapper
                 .map(customerRepo
                         .save(modelMapper
@@ -117,7 +122,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .collect(Collectors.toList());
     }
 
-    private Customer getCustomer(UUID customerId){
-        return getCustomer(customerId);
+    private Customer getCustomer(UUID customerId) {
+        return customerRepo.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("No customer with ID:"+customerId+" present."));
     }
 }
