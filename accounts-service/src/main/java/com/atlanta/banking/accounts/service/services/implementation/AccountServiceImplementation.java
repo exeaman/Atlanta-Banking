@@ -29,7 +29,6 @@ import com.atlanta.banking.accounts.service.utils.AccountType;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.var;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +47,11 @@ public class AccountServiceImplementation implements AccountService {
 
         if (!validateCustomer(accountCreationRequestDto.getCustomerId().toString()))
             throw new InvalidCustomerException(
-                    "No customer found with ID " + accountCreationRequestDto.getCustomerId().toString());
+                    "Account microservice issues " + accountCreationRequestDto.getCustomerId().toString());
 
-        if (!canOpen(accountCreationRequestDto.getCustomerId(), accountCreationRequestDto.getAccountType()))    throw new AccountDuplicacyException("A "+ accountCreationRequestDto.getAccountType().toString()+" account already exists with customer ID :"+accountCreationRequestDto.getCustomerId());
+        if (!canOpen(accountCreationRequestDto.getCustomerId(), accountCreationRequestDto.getAccountType()))
+            throw new AccountDuplicacyException("A " + accountCreationRequestDto.getAccountType().toString()
+                    + " account already exists with customer ID :" + accountCreationRequestDto.getCustomerId());
         // Account Entity Object
         Account account = new Account();
 
@@ -99,6 +100,20 @@ public class AccountServiceImplementation implements AccountService {
         if (accountsByCustomerId.isEmpty())
             throw new AccountNotFoundException("No accounts exists with customer ID :" + customerId);
         return accountsByCustomerId;
+    }
+
+    @Override
+    public Boolean hasAccount(UUID customerId) {
+        if (!validateCustomerFien.validateCustomer(customerId.toString()))
+            throw new InvalidCustomerException(
+                    "No customer found with ID " + customerId);
+        List<String> allUserIds = accMapRepo.findAllByCustomerId(customerId).stream()
+                .map(e -> e.getUserId()).toList();
+        List<AccountResponseDto> accountsByCustomerId = new ArrayList<>();
+        for (String userId : allUserIds) {
+            accountsByCustomerId.add(mapper.map(accountRepo.findByUserId(userId), AccountResponseDto.class));
+        }
+        return allUserIds.isEmpty() ? false : true;
     }
 
     @Override
@@ -189,6 +204,7 @@ public class AccountServiceImplementation implements AccountService {
     }
 
     private Boolean canOpen(UUID customerId, AccountType accountType) {
+        if(!hasAccount(customerId)) return true;
         List<AccountResponseDto> accounts = getAccountByCustomerId(customerId.toString());
 
         for (AccountResponseDto acc : accounts) {

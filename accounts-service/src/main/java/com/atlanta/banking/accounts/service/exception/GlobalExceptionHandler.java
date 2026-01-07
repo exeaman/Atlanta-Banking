@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.atlanta.banking.accounts.service.dto.AccountExceptionDto;
 
-@RestControllerAdvice
+import io.swagger.v3.oas.annotations.Hidden;
+
+
+@RestControllerAdvice (basePackages = "com.atlanta.banking")
+@Hidden
 public class GlobalExceptionHandler {
     @ExceptionHandler(AccountDuplicacyException.class)
     public ResponseEntity<AccountExceptionDto> accountDuplicacyException(AccountDuplicacyException e) {
