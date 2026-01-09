@@ -213,4 +213,12 @@ public class AccountServiceImplementation implements AccountService {
         }
         return true;
     }
+
+    @Override
+    public List<AccountResponseDto> getAllAccounts() {
+        List <AccountResponseDto> listOfAccounts =  accountRepo.findAll().stream().map(e-> mapper.map(e, AccountResponseDto.class)).toList();
+        if(listOfAccounts.isEmpty())    throw new AccountNotFoundException("No accounts exists. Create accounts first.");
+        else return listOfAccounts;
+        
+    }
 }

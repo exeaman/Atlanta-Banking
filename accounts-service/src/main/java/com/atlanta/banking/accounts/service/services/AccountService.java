@@ -31,4 +31,6 @@ public interface AccountService {
     Boolean validateCustomer(String customerId);
 
     Boolean hasAccount(UUID customerId);
+
+    List<AccountResponseDto> getAllAccounts();
 }
