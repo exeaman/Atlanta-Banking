@@ -86,4 +86,9 @@ public class AccountController {
     public ResponseEntity<BigDecimal> getBalance(@PathVariable String accountNumber) {
         return new ResponseEntity<>(accountService.getBalance(accountNumber), HttpStatus.OK);
     }
+
+    @GetMapping("/allaccounts")
+    public ResponseEntity<List<AccountResponseDto>> getAllaccounts() {
+        return new ResponseEntity<>(accountService.getAllAccounts(), HttpStatus.OK);
+    }
 }
