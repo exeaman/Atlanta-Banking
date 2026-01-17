@@ -1,5 +1,6 @@
 package com.atlanta.banking.customer.service.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +48,15 @@ public class CustomerController {
     public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
         return new ResponseEntity<>(customerServiceImpl.createCustomer(customerRequestDto), HttpStatus.OK);
     }
+    @PostMapping("/create/multiple")
+    public ResponseEntity<List<CustomerResponseDto>> createMultipleCustomers(@RequestBody List<CustomerRequestDto> customerRequestDtos){
 
+                List<CustomerResponseDto> customerResponseDtos = new ArrayList<>()  ;
+        for(var customerRequestDto : customerRequestDtos){
+            customerResponseDtos.add(customerServiceImpl.createCustomer(customerRequestDto));
+        }
+        return new  ResponseEntity<>(customerResponseDtos, HttpStatus.OK);
+    }
     @GetMapping("/phone-number/{phoneNumber}")
     public ResponseEntity<CustomerResponseDto> getCustomerByPhoneNumber(@PathVariable String phoneNumber) {
         return new ResponseEntity<>(customerServiceImpl.getCustomerByPhoneNumber(phoneNumber), HttpStatus.OK);
