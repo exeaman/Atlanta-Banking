@@ -1,5 +1,3 @@
 package com.atlanta.banking.identity.service.dto;
 
-public class LoginResponse {
-
-}
+public record LoginResponse(String token) {}

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -92,7 +93,7 @@ public class AccountServiceImplementation implements AccountService {
             throw new InvalidCustomerException(
                     "No customer found with ID " + customerId);
         List<String> allUserIds = accMapRepo.findAllByCustomerId(UUID.fromString(customerId)).stream()
-                .map(e -> e.getUserId()).toList();
+                .map(AccountCustomerMap::getUserId).toList();
         List<AccountResponseDto> accountsByCustomerId = new ArrayList<>();
         for (String userId : allUserIds) {
             accountsByCustomerId.add(mapper.map(accountRepo.findByUserId(userId), AccountResponseDto.class));
@@ -108,12 +109,12 @@ public class AccountServiceImplementation implements AccountService {
             throw new InvalidCustomerException(
                     "No customer found with ID " + customerId);
         List<String> allUserIds = accMapRepo.findAllByCustomerId(customerId).stream()
-                .map(e -> e.getUserId()).toList();
+                .map(AccountCustomerMap::getUserId).toList();
         List<AccountResponseDto> accountsByCustomerId = new ArrayList<>();
         for (String userId : allUserIds) {
             accountsByCustomerId.add(mapper.map(accountRepo.findByUserId(userId), AccountResponseDto.class));
         }
-        return allUserIds.isEmpty() ? false : true;
+        return !allUserIds.isEmpty();
     }
 
     @Override
@@ -216,7 +217,7 @@ public class AccountServiceImplementation implements AccountService {
 
     @Override
     public List<AccountResponseDto> getAllAccounts() {
-        List <AccountResponseDto> listOfAccounts =  accountRepo.findAll().stream().map(e-> mapper.map(e, AccountResponseDto.class)).toList();
+        List <AccountResponseDto> listOfAccounts =  accountRepo.findAll().stream().map(e-> mapper.map(e, AccountResponseDto.class)).collect(Collectors.toList());
         if(listOfAccounts.isEmpty())    throw new AccountNotFoundException("No accounts exists. Create accounts first.");
         else return listOfAccounts;
     }

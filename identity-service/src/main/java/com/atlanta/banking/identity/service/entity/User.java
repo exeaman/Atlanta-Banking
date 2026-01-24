@@ -16,7 +16,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema =  "identity")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
