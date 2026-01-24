@@ -4,10 +4,17 @@ import com.atlanta.banking.identity.service.entity.UserRoles;
 import lombok.Data;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Data
-public class RegisterRequest {
+public class RegisterResponse {
+    private UUID id;
+
     private String username;
+
     private String password;
-    private Set<UserRoles> roles;
+
+    private boolean enabled;
+
+    private Set<UserRoles> roles ;
 }
