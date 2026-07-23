@@ -3,7 +3,13 @@ package com.atlanta.banking.identity.service.dto.employee;
 import com.atlanta.banking.identity.service.enums.Department;
 import com.atlanta.banking.identity.service.enums.Designation;
 import jakarta.validation.constraints.*;
+import lombok.*;
 
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateEmployeeRequest {
 
     @NotBlank(message = "First name is required.")

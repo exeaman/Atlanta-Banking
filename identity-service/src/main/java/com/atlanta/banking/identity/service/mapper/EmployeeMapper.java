@@ -2,6 +2,7 @@ package com.atlanta.banking.identity.service.mapper;
 
 
 import com.atlanta.banking.identity.service.dto.employee.CreateEmployeeRequest;
+import com.atlanta.banking.identity.service.dto.employee.CreateEmployeeResponse;
 import com.atlanta.banking.identity.service.dto.employee.EmployeeResponse;
 import com.atlanta.banking.identity.service.entity.Employee;
 import com.atlanta.banking.identity.service.entity.Role;
@@ -21,6 +22,9 @@ public interface EmployeeMapper {
     @Mapping(target = "roles", source = "roles")
     EmployeeResponse toResponse(Employee employee);
 
+    @Mapping(target = "temporaryPassword", expression = "java(temporaryPassword)")
+    CreateEmployeeResponse toCreateResponse(Employee employee, String temporaryPassword);
+
     List<EmployeeResponse> toResponseList(List<Employee> employees);
 
     default Set<String> mapRoles(Set<Role> roles) {
@@ -32,4 +36,6 @@ public interface EmployeeMapper {
                 .map(Role::getName)
                 .collect(Collectors.toSet());
     }
+
+
 }

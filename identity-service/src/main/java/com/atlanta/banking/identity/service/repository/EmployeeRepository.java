@@ -1,10 +1,11 @@
 package com.atlanta.banking.identity.service.repository;
 
+import com.atlanta.banking.identity.service.entity.Employee;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import java.util.Optional;
 import java.util.UUID;
-
-import com.atlanta.banking.identity.service.entity.Employee;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 
 public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
@@ -24,4 +25,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     boolean existsByEmail(String email);
 
     boolean existsByPhoneNumber(String phoneNumber);
+
+    @EntityGraph(attributePaths = "roles")
+    Optional<Employee> findWithRolesByUsername(String username);
 }

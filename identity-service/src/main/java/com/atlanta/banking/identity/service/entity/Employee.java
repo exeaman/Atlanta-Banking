@@ -1,16 +1,16 @@
 package com.atlanta.banking.identity.service.entity;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import com.atlanta.banking.identity.service.enums.Department;
 import com.atlanta.banking.identity.service.enums.Designation;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -41,7 +41,7 @@ public class Employee {
     @Column(nullable = false, length = 50)
     private String lastName;
 
-    @Column(unique = true , nullable = false, length = 254)
+    @Column(unique = true, nullable = false, length = 254)
     private String email;
 
     @Column(unique = true, nullable = false, length = 10)
@@ -91,7 +91,7 @@ public class Employee {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "employee_roles",
-            joinColumns = @JoinColumn(name = "employee_id", referencedColumnName = "employee_system_id"),
+            joinColumns = @JoinColumn(name = "employee_system_id", referencedColumnName = "employee_system_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private Set<Role> roles = new HashSet<>();
