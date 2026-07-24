@@ -4,8 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -15,21 +13,19 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
-@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private final SecretKey signingKey;
+    private final long jwtExpiration;
 
-    @Value("${jwt.expiration}")
-    private long jwtExpiration;
+    public JwtService(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") long jwtExpiration) {
 
-    private SecretKey signingKey;
-
-    @PostConstruct
-    void init() {
-        signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        this.jwtExpiration = jwtExpiration;
+        this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
+
 
     public String generateToken(UserDetails userDetails) {
 

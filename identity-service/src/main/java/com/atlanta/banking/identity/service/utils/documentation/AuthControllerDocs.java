@@ -61,18 +61,5 @@ public interface AuthControllerDocs {
               "mustChangePassword": false
             }
             """))), @ApiResponse(responseCode = "401", description = "Authentication required"), @ApiResponse(responseCode = "403", description = "Access denied")})
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "Employee information", content = @Content(mediaType = "application/json", examples = @ExampleObject(name = "Create Employee", value = """
-            {
-              "firstName": "John",
-              "lastName": "Doe",
-              "email": "john.doe@atlantabank.com",
-              "phoneNumber": "9876543210",
-              "department": "IT",
-              "designation": "Manager",
-              "roles": [
-                "ROLE_MANAGER"
-              ]
-            }
-            """)))
     ResponseEntity<EmployeeProfileResponse> me();
 }

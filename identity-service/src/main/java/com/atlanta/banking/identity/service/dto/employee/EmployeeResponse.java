@@ -2,7 +2,10 @@ package com.atlanta.banking.identity.service.dto.employee;
 
 import com.atlanta.banking.identity.service.enums.Department;
 import com.atlanta.banking.identity.service.enums.Designation;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
@@ -14,7 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @SuperBuilder
 @AllArgsConstructor
-@Builder
 public class EmployeeResponse {
 
     private UUID systemId;

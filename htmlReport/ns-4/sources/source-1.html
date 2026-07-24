@@ -1,0 +1,287 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmployeeServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.atlanta.banking.identity.service.services.employee.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: EmployeeServiceImpl (com.atlanta.banking.identity.service.services.employee.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmployeeServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (26/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (51/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.atlanta.banking.identity.service.services.employee.impl;
+&nbsp;
+&nbsp;import com.atlanta.banking.identity.service.dto.employee.CreateEmployeeRequest;
+&nbsp;import com.atlanta.banking.identity.service.dto.employee.CreateEmployeeResponse;
+&nbsp;import com.atlanta.banking.identity.service.dto.employee.EmployeeResponse;
+&nbsp;import com.atlanta.banking.identity.service.dto.employee.UpdateEmployeeRequest;
+&nbsp;import com.atlanta.banking.identity.service.entity.Employee;
+&nbsp;import com.atlanta.banking.identity.service.entity.Role;
+&nbsp;import com.atlanta.banking.identity.service.exception.common.DuplicateResourceException;
+&nbsp;import com.atlanta.banking.identity.service.exception.common.ResourceNotFoundException;
+&nbsp;import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyDisabledException;
+&nbsp;import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyEnabledException;
+&nbsp;import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyTerminatedException;
+&nbsp;import com.atlanta.banking.identity.service.exception.role.InvalidRoleAssignmentException;
+&nbsp;import com.atlanta.banking.identity.service.mapper.EmployeeMapper;
+&nbsp;import com.atlanta.banking.identity.service.repository.EmployeeRepository;
+&nbsp;import com.atlanta.banking.identity.service.repository.RoleRepository;
+&nbsp;import com.atlanta.banking.identity.service.services.employee.EmployeeService;
+&nbsp;import com.atlanta.banking.identity.service.utils.generator.EmployeeIdGenerator;
+&nbsp;import com.atlanta.banking.identity.service.utils.generator.TemporaryPasswordGenerator;
+&nbsp;import com.atlanta.banking.identity.service.utils.generator.UsernameGenerator;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.UUID;
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class EmployeeServiceImpl implements EmployeeService {
+&nbsp;
+&nbsp;    private final EmployeeRepository employeeRepository;
+&nbsp;    private final RoleRepository roleRepository;
+&nbsp;    private final EmployeeMapper employeeMapper;
+&nbsp;
+&nbsp;    private final EmployeeIdGenerator employeeIdGenerator;
+&nbsp;    private final UsernameGenerator usernameGenerator;
+&nbsp;    private final TemporaryPasswordGenerator temporaryPasswordGenerator;
+&nbsp;
+&nbsp;    private final PasswordEncoder passwordEncoder;
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    @Override
+&nbsp;    public CreateEmployeeResponse createEmployee(CreateEmployeeRequest request) {
+&nbsp;
+<b class="fc">&nbsp;        if (employeeRepository.existsByEmail(request.getEmail())) {</b>
+<b class="fc">&nbsp;            throw new DuplicateResourceException(&quot;Email already exists.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (employeeRepository.existsByPhoneNumber(request.getPhoneNumber())) {</b>
+<b class="fc">&nbsp;            throw new DuplicateResourceException(&quot;Phone number already exists.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Employee employee = employeeMapper.toEntity(request);</b>
+&nbsp;
+<b class="fc">&nbsp;        employee.setEmployeeId(employeeIdGenerator.generate());</b>
+&nbsp;
+&nbsp;        String username;
+&nbsp;
+&nbsp;        do {
+<b class="fc">&nbsp;            username = usernameGenerator.generate(request.getFirstName(), request.getLastName());</b>
+<b class="fc">&nbsp;        } while (employeeRepository.existsByUsername(username));</b>
+&nbsp;
+<b class="fc">&nbsp;        employee.setUsername(username);</b>
+&nbsp;
+<b class="fc">&nbsp;        String temporaryPassword = temporaryPasswordGenerator.generate();</b>
+<b class="fc">&nbsp;        employee.setPassword(passwordEncoder.encode(temporaryPassword));</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;Role&gt; requestedRoles = roleRepository.findAllByNameIn(request.getRoles());</b>
+&nbsp;
+<b class="fc">&nbsp;        if (requestedRoles.size() != request.getRoles().size()) {</b>
+<b class="fc">&nbsp;            throw new InvalidRoleAssignmentException(&quot;One or more roles are invalid.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        employee.setRoles(new HashSet&lt;&gt;(requestedRoles));</b>
+&nbsp;
+<b class="fc">&nbsp;        Employee savedEmployee = employeeRepository.save(employee);</b>
+&nbsp;
+<b class="fc">&nbsp;        return employeeMapper.toCreateResponse(savedEmployee, temporaryPassword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    @Override
+&nbsp;    public EmployeeResponse getEmployeeBySystemId(UUID systemId) {
+<b class="fc">&nbsp;        return employeeMapper.toResponse(getEmployee(systemId));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EmployeeResponse getEmployeeByEmployeeId(String employeeId) {
+<b class="fc">&nbsp;        return employeeMapper.toResponse(employeeRepository.findByEmployeeId(employeeId).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Employee with employee ID &quot; + employeeId + &quot; not found.&quot;)));</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(readOnly = true)
+&nbsp;    @Override
+&nbsp;    public List&lt;EmployeeResponse&gt; findEmployees() {
+<b class="fc">&nbsp;        return employeeMapper.toResponseList(employeeRepository.findAll());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    @Override
+&nbsp;    public EmployeeResponse updateEmployee(UUID systemId, UpdateEmployeeRequest request) {
+&nbsp;
+<b class="fc">&nbsp;        Employee employee = getEmployee(systemId);</b>
+<b class="fc">&nbsp;        if (!employee.getEmail().equals(request.getEmail()) &amp;&amp; employeeRepository.existsByEmail(request.getEmail())) {</b>
+<b class="fc">&nbsp;            throw new DuplicateResourceException(&quot;Email already exists.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!employee.getPhoneNumber().equals(request.getPhoneNumber()) &amp;&amp; employeeRepository.existsByPhoneNumber(request.getPhoneNumber())) {</b>
+<b class="fc">&nbsp;            throw new DuplicateResourceException(&quot;Phone number already exists.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        employee.setFirstName(request.getFirstName());</b>
+<b class="fc">&nbsp;        employee.setLastName(request.getLastName());</b>
+<b class="fc">&nbsp;        employee.setEmail(request.getEmail());</b>
+<b class="fc">&nbsp;        employee.setPhoneNumber(request.getPhoneNumber());</b>
+<b class="fc">&nbsp;        employee.setDepartment(request.getDepartment());</b>
+<b class="fc">&nbsp;        employee.setDesignation(request.getDesignation());</b>
+<b class="fc">&nbsp;        return employeeMapper.toResponse(employeeRepository.save(employee));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    @Override
+&nbsp;    public EmployeeResponse enableEmployee(UUID systemId) {
+<b class="fc">&nbsp;        Employee employee = getEmployee(systemId);</b>
+<b class="fc">&nbsp;        if (!employee.getEmployed()) throw new EmployeeAlreadyTerminatedException(&quot;This employee has been terminated!&quot;);</b>
+<b class="fc">&nbsp;        if (employee.getEnabled()) throw new EmployeeAlreadyEnabledException(&quot;This employee is already enabled!&quot;);</b>
+<b class="fc">&nbsp;        employee.setEnabled(Boolean.TRUE);</b>
+<b class="fc">&nbsp;        return employeeMapper.toResponse(employeeRepository.save(employee));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    @Override
+&nbsp;    public EmployeeResponse disableEmployee(UUID systemId) {
+<b class="fc">&nbsp;        Employee employee = getEmployee(systemId);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!employee.getEmployed()) {</b>
+<b class="fc">&nbsp;            throw new EmployeeAlreadyTerminatedException(&quot;This employee has been terminated!&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (!employee.getEnabled()) {</b>
+<b class="fc">&nbsp;            throw new EmployeeAlreadyDisabledException(&quot;This employee is already disabled!&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        employee.setEnabled(Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        return employeeMapper.toResponse(employeeRepository.save(employee));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    @Override
+&nbsp;    public EmployeeResponse terminateEmployee(UUID systemId) {
+<b class="fc">&nbsp;        Employee employee = getEmployee(systemId);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!employee.getEmployed()) {</b>
+<b class="fc">&nbsp;            throw new EmployeeAlreadyTerminatedException(&quot;This employee has already been terminated!&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        employee.setEmployed(Boolean.FALSE);</b>
+<b class="fc">&nbsp;        employee.setEnabled(Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        return employeeMapper.toResponse(employeeRepository.save(employee));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Employee getEmployee(UUID systemId) {
+<b class="fc">&nbsp;        return employeeRepository.findById(systemId).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Employee with system ID &quot; + systemId + &quot; not found.&quot;));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-07-25 00:23</div>
+</div>
+</body>
+</html>
