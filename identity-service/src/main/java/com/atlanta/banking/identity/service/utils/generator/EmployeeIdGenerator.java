@@ -15,8 +15,7 @@ public class EmployeeIdGenerator {
     @Transactional
     public String generate() {
 
-        EmployeeSequence sequence = sequenceRepository.findById(1L)
-                .orElseThrow(() -> new IllegalStateException("Employee sequence not initialized."));
+        EmployeeSequence sequence = sequenceRepository.findById(1L).orElseThrow(() -> new IllegalStateException("Employee sequence not initialized."));
 
         long employeeId = sequence.getNextValue();
 

@@ -19,11 +19,6 @@ public class EmployeeSequenceSeeder {
             return;
         }
 
-        repository.save(
-                new EmployeeSequence(
-                        1L,
-                        100000000L
-                )
-        );
+        repository.save(new EmployeeSequence(1L, 100000000L));
     }
 }

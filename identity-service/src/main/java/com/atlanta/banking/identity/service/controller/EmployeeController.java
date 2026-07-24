@@ -5,10 +5,12 @@ import com.atlanta.banking.identity.service.dto.employee.CreateEmployeeResponse;
 import com.atlanta.banking.identity.service.dto.employee.EmployeeResponse;
 import com.atlanta.banking.identity.service.dto.employee.UpdateEmployeeRequest;
 import com.atlanta.banking.identity.service.services.employee.EmployeeService;
+import com.atlanta.banking.identity.service.utils.documentation.EmployeeControllerDocs;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,72 +19,63 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/employees")
 @RequiredArgsConstructor
-public class EmployeeController {
+public class EmployeeController implements EmployeeControllerDocs {
 
     private final EmployeeService employeeService;
 
     @PostMapping
-    public ResponseEntity<CreateEmployeeResponse> createEmployee(
-            @Valid @RequestBody CreateEmployeeRequest request) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<CreateEmployeeResponse> createEmployee(@Valid @RequestBody CreateEmployeeRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(employeeService.createEmployee(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(request));
     }
 
     @GetMapping("/{systemId}")
-    public ResponseEntity<EmployeeResponse> getEmployeeBySystemId(
-            @PathVariable UUID systemId) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'SECURITY_ADMIN')")
+    public ResponseEntity<EmployeeResponse> getEmployeeBySystemId(@PathVariable UUID systemId) {
 
-        return ResponseEntity.ok(
-                employeeService.getEmployeeBySystemId(systemId));
+        return ResponseEntity.ok(employeeService.getEmployeeBySystemId(systemId));
     }
 
     @GetMapping("/employee-id/{employeeId}")
-    public ResponseEntity<EmployeeResponse> getEmployeeByEmployeeId(
-            @PathVariable String employeeId) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'SECURITY_ADMIN')")
+    public ResponseEntity<EmployeeResponse> getEmployeeByEmployeeId(@PathVariable String employeeId) {
 
-        return ResponseEntity.ok(
-                employeeService.getEmployeeByEmployeeId(employeeId));
+        return ResponseEntity.ok(employeeService.getEmployeeByEmployeeId(employeeId));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'SECURITY_ADMIN')")
     public ResponseEntity<List<EmployeeResponse>> findEmployees() {
 
-        return ResponseEntity.ok(
-                employeeService.findEmployees());
+        return ResponseEntity.ok(employeeService.findEmployees());
     }
 
     @PutMapping("/{systemId}")
-    public ResponseEntity<EmployeeResponse> updateEmployee(
-            @PathVariable UUID systemId,
-            @Valid @RequestBody UpdateEmployeeRequest request) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable UUID systemId, @Valid @RequestBody UpdateEmployeeRequest request) {
 
-        return ResponseEntity.ok(
-                employeeService.updateEmployee(systemId, request));
+        return ResponseEntity.ok(employeeService.updateEmployee(systemId, request));
     }
 
     @PatchMapping("/{systemId}/enable")
-    public ResponseEntity<EmployeeResponse> enableEmployee(
-            @PathVariable UUID systemId) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<EmployeeResponse> enableEmployee(@PathVariable UUID systemId) {
 
-        return ResponseEntity.ok(
-                employeeService.enableEmployee(systemId));
+        return ResponseEntity.ok(employeeService.enableEmployee(systemId));
     }
 
     @PatchMapping("/{systemId}/disable")
-    public ResponseEntity<EmployeeResponse> disableEmployee(
-            @PathVariable UUID systemId) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<EmployeeResponse> disableEmployee(@PathVariable UUID systemId) {
 
-        return ResponseEntity.ok(
-                employeeService.disableEmployee(systemId));
+        return ResponseEntity.ok(employeeService.disableEmployee(systemId));
     }
 
     @PatchMapping("/{systemId}/terminate")
-    public ResponseEntity<EmployeeResponse> terminateEmployee(
-            @PathVariable UUID systemId) {
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<EmployeeResponse> terminateEmployee(@PathVariable UUID systemId) {
 
-        return ResponseEntity.ok(
-                employeeService.terminateEmployee(systemId));
+        return ResponseEntity.ok(employeeService.terminateEmployee(systemId));
     }
 }

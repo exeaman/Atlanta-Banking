@@ -7,13 +7,9 @@ import java.util.Set;
 
 public record SeedEmployee(
 
-        String firstName,
-        String lastName,
-        String email,
-        String phoneNumber,
+        String firstName, String lastName, String email, String phoneNumber,
 
-        Department department,
-        Designation designation,
+        Department department, Designation designation,
 
         String password,
 

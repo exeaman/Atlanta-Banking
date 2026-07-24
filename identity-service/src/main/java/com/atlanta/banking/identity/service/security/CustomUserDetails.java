@@ -12,11 +12,7 @@ import java.util.stream.Collectors;
 public record CustomUserDetails(Employee employee) implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return employee.getRoles()
-                .stream()
-                .map(Role::getName)
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toSet());
+        return employee.getRoles().stream().map(Role::getName).map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toSet());
     }
 
     @Override

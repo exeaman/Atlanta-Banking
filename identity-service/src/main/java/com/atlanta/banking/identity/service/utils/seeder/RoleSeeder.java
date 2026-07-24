@@ -26,12 +26,7 @@ public class RoleSeeder {
 
         for (String[] roleData : SeedData.INITIAL_ROLES) {
 
-            roles.add(
-                    Role.builder()
-                            .name(roleData[0])
-                            .description(roleData[1])
-                            .build()
-            );
+            roles.add(Role.builder().name(roleData[0]).description(roleData[1]).build());
         }
 
         roleRepository.saveAll(roles);

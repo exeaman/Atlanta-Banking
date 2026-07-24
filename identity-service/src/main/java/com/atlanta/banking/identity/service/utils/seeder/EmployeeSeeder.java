@@ -37,21 +37,7 @@ public class EmployeeSeeder {
 
         for (SeedEmployee seedEmployee : SeedData.INITIAL_EMPLOYEES) {
 
-            Employee employee = Employee.builder()
-                    .employeeId(employeeIdGenerator.generate())
-                    .username(generateUniqueUsername(
-                            seedEmployee.firstName(),
-                            seedEmployee.lastName()))
-                    .password(passwordEncoder.encode(seedEmployee.password()))
-                    .firstName(seedEmployee.firstName())
-                    .lastName(seedEmployee.lastName())
-                    .email(seedEmployee.email())
-                    .phoneNumber(seedEmployee.phoneNumber())
-                    .department(seedEmployee.department())
-                    .designation(seedEmployee.designation())
-                    .credentialsExpired(false)
-                    .roles(loadRoles(seedEmployee.roles()))
-                    .build();
+            Employee employee = Employee.builder().employeeId(employeeIdGenerator.generate()).username(generateUniqueUsername(seedEmployee.firstName(), seedEmployee.lastName())).password(passwordEncoder.encode(seedEmployee.password())).firstName(seedEmployee.firstName()).lastName(seedEmployee.lastName()).email(seedEmployee.email()).phoneNumber(seedEmployee.phoneNumber()).department(seedEmployee.department()).designation(seedEmployee.designation()).credentialsExpired(false).roles(loadRoles(seedEmployee.roles())).build();
 
             employees.add(employee);
         }

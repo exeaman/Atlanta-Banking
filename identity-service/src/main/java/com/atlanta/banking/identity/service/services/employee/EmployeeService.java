@@ -18,10 +18,7 @@ public interface EmployeeService {
 
     List<EmployeeResponse> findEmployees();
 
-    EmployeeResponse updateEmployee(
-            UUID systemId,
-            UpdateEmployeeRequest request
-    );
+    EmployeeResponse updateEmployee(UUID systemId, UpdateEmployeeRequest request);
 
     EmployeeResponse enableEmployee(UUID systemId);
 

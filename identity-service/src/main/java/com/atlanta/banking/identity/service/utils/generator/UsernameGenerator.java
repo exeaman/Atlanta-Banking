@@ -19,8 +19,7 @@ public class UsernameGenerator {
             return cleaned.substring(0, 2);
         }
 
-        return ("XX" + cleaned)
-                .substring(("XX" + cleaned).length() - 2);
+        return ("XX" + cleaned).substring(("XX" + cleaned).length() - 2);
     }
 
     private String lastTwo(String name) {
@@ -31,8 +30,7 @@ public class UsernameGenerator {
             return cleaned.substring(cleaned.length() - 2);
         }
 
-        return ("XX" + cleaned)
-                .substring(("XX" + cleaned).length() - 2);
+        return ("XX" + cleaned).substring(("XX" + cleaned).length() - 2);
     }
 
     public String generate(String firstName, String lastName) {

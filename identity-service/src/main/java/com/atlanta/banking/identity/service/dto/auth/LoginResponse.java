@@ -16,10 +16,6 @@ public class LoginResponse {
     @Builder.Default
     private String tokenType = "Bearer";
 
-    /**
-     * Expiration time in seconds.
-     * (15 minutes = 900)
-     */
     private Long expiresIn;
 
     private String employeeId;

@@ -28,19 +28,12 @@ public class JwtService {
 
     @PostConstruct
     void init() {
-        signingKey = Keys.hmacShaKeyFor(
-                Decoders.BASE64.decode(secret)
-        );
+        signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
     public String generateToken(UserDetails userDetails) {
 
-        return Jwts.builder()
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(signingKey)
-                .compact();
+        return Jwts.builder().subject(userDetails.getUsername()).issuedAt(new Date()).expiration(new Date(System.currentTimeMillis() + jwtExpiration)).signWith(signingKey).compact();
     }
 
     public String extractUsername(String token) {
@@ -53,17 +46,14 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
 
-        return extractUsername(token).equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+        return extractUsername(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public <T> T extractClaim(
-            String token,
-            Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 
         Claims claims = extractAllClaims(token);
 
@@ -72,10 +62,6 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
 
-        return Jwts.parser()
-                .verifyWith(signingKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        return Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(token).getPayload();
     }
 }

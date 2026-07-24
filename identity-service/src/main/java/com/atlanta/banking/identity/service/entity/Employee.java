@@ -89,10 +89,6 @@ public class Employee {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "employee_roles",
-            joinColumns = @JoinColumn(name = "employee_system_id", referencedColumnName = "employee_system_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "employee_roles", joinColumns = @JoinColumn(name = "employee_system_id", referencedColumnName = "employee_system_id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
 }

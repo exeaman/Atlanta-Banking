@@ -32,10 +32,7 @@ public interface EmployeeMapper {
             return Set.of();
         }
 
-        return roles.stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
+        return roles.stream().map(Role::getName).collect(Collectors.toSet());
     }
-
 
 }
