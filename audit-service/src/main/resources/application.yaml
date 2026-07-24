@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: audit-service
+
+  profiles:
+    active: dev
+
+jwt:
+  expiration: 900000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p){highlight} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %m%n"
+
+  level:
+    root: INFO
+
+    com.atlantabanking.audit: DEBUG
+
+    org.springframework.security: INFO
+    org.springframework.transaction: INFO
+    org.springframework.web: INFO
+    org.springframework.boot: INFO
+
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: INFO

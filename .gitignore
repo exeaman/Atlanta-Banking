@@ -26,3 +26,13 @@ Thumbs.db
 # Allow base Spring config
 !application.properties
 !**/application.properties
+
+.env
+
+.tmp
+
+caches
+daemon
+htmlReport
+native
+wrapper
