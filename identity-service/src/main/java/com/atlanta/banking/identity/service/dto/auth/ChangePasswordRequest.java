@@ -3,7 +3,9 @@ package com.atlanta.banking.identity.service.dto.auth;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record ChangePasswordRequest(
 
         @NotBlank String currentPassword,
