@@ -10,7 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -19,24 +21,19 @@ public class JwtService {
     private final SecretKey signingKey;
     private final long jwtExpiration;
 
-    public JwtService(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long jwtExpiration) {
+    public JwtService(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") long jwtExpiration) {
 
         this.jwtExpiration = jwtExpiration;
         this.signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
+
     public String generateToken(UserDetails userDetails) {
 
-        return Jwts.builder().subject(userDetails.getUsername()).claim(
-            "roles",
-            userDetails.getAuthorities()
-                    .stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList()
-        ).issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + jwtExpiration)).signWith(signingKey).compact();
+        CustomUserDetails principal = (CustomUserDetails) userDetails;
+        Instant now = Instant.now();
+
+        return Jwts.builder().subject(principal.employee().getUsername()).issuer("identity-service").audience().add("atlanta-banking").and().id(UUID.randomUUID().toString()).claim("username", principal.getUsername()).claim("roles", principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()).issuedAt(Date.from(now)).expiration(Date.from(now.plusMillis(jwtExpiration))).signWith(signingKey).compact();
     }
 
     public String extractUsername(String token) {
