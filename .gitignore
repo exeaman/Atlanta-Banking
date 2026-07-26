@@ -36,3 +36,6 @@ daemon
 htmlReport
 native
 wrapper
+workers
+*.http
+*.html

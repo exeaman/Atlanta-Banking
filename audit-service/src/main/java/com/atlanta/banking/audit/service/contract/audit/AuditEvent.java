@@ -4,9 +4,9 @@ import com.atlanta.banking.audit.service.contract.audit.enums.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -49,6 +49,7 @@ public record AuditEvent(
         @NotBlank
         String sourceService,
 
-        JsonNode metadata
+        Map<String, Object> metadata
 
-) {}
+) {
+}
