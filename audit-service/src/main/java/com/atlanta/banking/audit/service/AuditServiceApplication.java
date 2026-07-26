@@ -2,13 +2,14 @@ package com.atlanta.banking.audit.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.kafka.annotation.EnableKafka;
 
 @SpringBootApplication
+@EnableKafka
 public class AuditServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AuditServiceApplication.class, args);
-	}
+    static void main(String[] args) {
+        SpringApplication.run(AuditServiceApplication.class, args);
+    }
 
 }

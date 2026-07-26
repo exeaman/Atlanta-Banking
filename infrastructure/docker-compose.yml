@@ -1,0 +1,87 @@
+name: ${COMPOSE_PROJECT_NAME}
+
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: atlanta-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+
+    networks:
+      - ${DOCKER_NETWORK}
+
+
+  kafka:
+    image: apache/kafka:4.1.0
+    container_name: atlanta-kafka
+    restart: unless-stopped
+
+    ports:
+      - "${KAFKA_PORT}:9092"
+
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      KAFKA_LISTENERS: PLAINTEXT://:9092,DOCKER://:29092,CONTROLLER://:${KAFKA_CONTROLLER_PORT}
+
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:${KAFKA_PORT},DOCKER://kafka:29092
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:${KAFKA_CONTROLLER_PORT}
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+    networks:
+      - ${DOCKER_NETWORK}
+
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: atlanta-kafka-ui
+    restart: unless-stopped
+
+    ports:
+      - "${KAFKA_UI_PORT}:8080"
+
+    environment:
+      KAFKA_CLUSTERS_0_NAME: Atlanta-Banking
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+    depends_on:
+      - kafka
+
+    networks:
+      - ${DOCKER_NETWORK}
+
+
+volumes:
+  postgres-data:
+  kafka-data:
+
+
+networks:
+  ${DOCKER_NETWORK}:
+    driver: bridge

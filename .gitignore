@@ -39,3 +39,6 @@ wrapper
 workers
 *.http
 *.html
+
+infrastructure/.env
+undefined-build

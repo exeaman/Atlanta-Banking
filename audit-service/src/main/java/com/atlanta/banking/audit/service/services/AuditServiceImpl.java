@@ -4,6 +4,7 @@ import com.atlanta.banking.audit.service.contract.audit.AuditEvent;
 import com.atlanta.banking.audit.service.dto.AuditResponse;
 import com.atlanta.banking.audit.service.dto.AuditSearchCriteria;
 import com.atlanta.banking.audit.service.entity.AuditLog;
+import com.atlanta.banking.audit.service.event.EmployeeCreatedEvent;
 import com.atlanta.banking.audit.service.exception.DuplicateAuditEventException;
 import com.atlanta.banking.audit.service.mapper.AuditMapper;
 import com.atlanta.banking.audit.service.repository.AuditRepository;
@@ -59,5 +60,13 @@ public class AuditServiceImpl implements AuditService {
         return auditRepository
                 .findAll(AuditSpecification.from(criteria), pageable)
                 .map(auditMapper::toResponse);
+    }
+
+    @Override
+    public void processEmployeeCreated(EmployeeCreatedEvent event) {
+
+        AuditEvent auditEvent = auditMapper.toEvent(event);
+
+        auditRepository.save(auditMapper.toEntity(auditEvent));
     }
 }

@@ -6,13 +6,16 @@ import com.atlanta.banking.identity.service.dto.employee.EmployeeResponse;
 import com.atlanta.banking.identity.service.dto.employee.UpdateEmployeeRequest;
 import com.atlanta.banking.identity.service.entity.Employee;
 import com.atlanta.banking.identity.service.entity.Role;
+import com.atlanta.banking.identity.service.event.EmployeeCreatedEvent;
 import com.atlanta.banking.identity.service.exception.common.DuplicateResourceException;
 import com.atlanta.banking.identity.service.exception.common.ResourceNotFoundException;
 import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyDisabledException;
 import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyEnabledException;
 import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyTerminatedException;
 import com.atlanta.banking.identity.service.exception.role.InvalidRoleAssignmentException;
+import com.atlanta.banking.identity.service.mapper.EmployeeEventMapper;
 import com.atlanta.banking.identity.service.mapper.EmployeeMapper;
+import com.atlanta.banking.identity.service.producer.EmployeeEventProducer;
 import com.atlanta.banking.identity.service.repository.EmployeeRepository;
 import com.atlanta.banking.identity.service.repository.RoleRepository;
 import com.atlanta.banking.identity.service.services.employee.EmployeeService;
@@ -35,7 +38,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final EmployeeMapper employeeMapper;
-
+    private final EmployeeEventProducer employeeEventProducer;
+    private final EmployeeEventMapper employeeEventMapper;
     private final EmployeeIdGenerator employeeIdGenerator;
     private final UsernameGenerator usernameGenerator;
     private final TemporaryPasswordGenerator temporaryPasswordGenerator;
@@ -78,7 +82,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setRoles(new HashSet<>(requestedRoles));
 
         Employee savedEmployee = employeeRepository.save(employee);
-
+        EmployeeCreatedEvent event = employeeEventMapper.toEmployeeCreatedEvent(savedEmployee);
+        employeeEventProducer.publishEmployeeCreated(event);
         return employeeMapper.toCreateResponse(savedEmployee, temporaryPassword);
     }
 

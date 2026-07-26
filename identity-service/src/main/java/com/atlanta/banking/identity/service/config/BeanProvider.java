@@ -2,8 +2,10 @@ package com.atlanta.banking.identity.service.config;
 
 import com.atlanta.banking.identity.service.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,5 +42,19 @@ public class BeanProvider {
                 """);
 
         return hierarchy;
+    }
+
+
+    @Bean
+    CommandLineRunner verifyDatabase(JdbcTemplate jdbcTemplate) {
+        return args -> {
+            System.out.println(
+                    jdbcTemplate.queryForObject(
+                            "select current_database()", String.class));
+
+            System.out.println(
+                    jdbcTemplate.queryForObject(
+                            "select current_schema()", String.class));
+        };
     }
 }

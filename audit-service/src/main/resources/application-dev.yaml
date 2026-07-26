@@ -3,19 +3,27 @@ server:
 
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/audit_db
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: audit-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: java.util.LinkedHashMap
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: com.atlanta.banking.identity.service.event
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
     hibernate:
       ddl-auto: update
-
     show-sql: true
-
     properties:
       hibernate:
         format_sql: true
@@ -25,16 +33,29 @@ eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: ${EUREKA_SERVER}
+      defaultZone: http://localhost:8761/eureka
     register-with-eureka: true
     fetch-registry: false
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: CHANGE_ME_TO_YOUR_SECRET
 
-  logging:
-    level:
-      root: INFO
-      org.springframework.security: TRACE
-      org.springframework.web: INFO
-      com.atlanta.banking.audit.service: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.atlantabanking.audit: DEBUG
+    org.springframework.security: WARN
+    org.springframework.transaction: WARN
+    org.springframework.web: WARN
+    org.springframework.boot: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: INFO
