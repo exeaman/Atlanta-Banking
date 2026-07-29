@@ -40,5 +40,8 @@ workers
 *.http
 *.html
 
+.env
+.venv
+
 infrastructure/.env
 undefined-build

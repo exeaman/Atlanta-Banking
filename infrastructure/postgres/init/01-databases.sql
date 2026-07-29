@@ -1,2 +1,0 @@
-CREATE DATABASE identity_db;
-CREATE DATABASE audit_db;
