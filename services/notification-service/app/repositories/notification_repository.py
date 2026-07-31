@@ -1,56 +1,42 @@
+from uuid import UUID
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
 from app.models.notification import Notification
 
 
 class NotificationRepository:
 
-    def __init__(self, session: AsyncSession):
-        self._session = session
+    def __init__(self, db: Session):
+        self.db = db
 
-    async def save(
-        self,
-        notification: Notification,
-    ) -> Notification:
-
-        # Register this entity with SQLAlchemy's Unit of Work.
-        #
-        # No SQL is executed yet.
-        # SQLAlchemy simply starts tracking this object.
-        self._session.add(notification)
-
-        # Flush all pending INSERT/UPDATE/DELETE statements
-        # to the database and commit the transaction.
-        await self._session.commit()
-
-        # Reload the entity from the database.
-        #
-        # This is important because the database may have
-        # generated values such as:
-        #   - id
-        #   - created_at
-        #   - trigger-generated values
-        await self._session.refresh(notification)
-
+    def save(self, notification: Notification) -> Notification:
+        self.db.add(notification)
+        self.db.commit()
+        self.db.refresh(notification)
         return notification
 
-    async def find_by_id(
-        self,
-        notification_id,
-    ) -> Notification | None:
+    def find_by_id(self, notification_id: UUID) -> Notification | None:
+        return self.db.get(Notification, notification_id)
 
-        # Build the SQL query.
-        #
-        # Still no SQL execution here.
-        statement = select(Notification).where(
-            Notification.id == notification_id
+    def find_by_event_id(self, event_id: UUID) -> Notification | None:
+        stmt = (
+            select(Notification)
+            .where(Notification.event_id == event_id)
         )
 
-        # Execute the SQL against PostgreSQL.
-        result = await self._session.execute(statement)
+        return self.db.scalar(stmt)
 
-        # Convert the SQLAlchemy Result object into either:
-        #   Notification
-        #   None
-        return result.scalar_one_or_none()
+    def find_by_correlation_id(
+        self,
+        correlation_id: UUID,
+    ) -> list[Notification]:
+
+        stmt = (
+            select(Notification)
+            .where(Notification.correlation_id == correlation_id)
+            .order_by(Notification.created_at)
+        )
+
+        return list(self.db.scalars(stmt).all())

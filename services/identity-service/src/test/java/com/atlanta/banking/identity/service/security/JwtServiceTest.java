@@ -1,33 +1,30 @@
 package com.atlanta.banking.identity.service.security;
 
+import com.atlanta.banking.identity.service.entity.Employee;
+import com.atlanta.banking.identity.service.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Date;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JwtServiceTest {
+class JwtServiceTest {
 
     private static final String SECRET =
             "VGhpc0lzQVN1cGVyU2VjcmV0S2V5Rm9ySldUU2lnbmluZzEyMzQ1Njc4OTA=";
 
     private JwtService jwtService;
-    private UserDetails userDetails;
+    private CustomUserDetails userDetails;
 
     @BeforeEach
     void setUp() {
         jwtService = new JwtService(SECRET, 60_000L);
-
-        userDetails = User.withUsername("john")
-                .password("password")
-                .authorities("ROLE_ADMIN")
-                .build();
+        userDetails = createUser("john");
     }
 
     @Test
@@ -56,10 +53,7 @@ public class JwtServiceTest {
     void shouldReturnFalseForDifferentUser() {
         String token = jwtService.generateToken(userDetails);
 
-        UserDetails otherUser = User.withUsername("alex")
-                .password("password")
-                .authorities("ROLE_ADMIN")
-                .build();
+        CustomUserDetails otherUser = createUser("alex");
 
         assertFalse(jwtService.isTokenValid(token, otherUser));
     }
@@ -129,5 +123,24 @@ public class JwtServiceTest {
                 IllegalArgumentException.class,
                 () -> jwtService.extractUsername("")
         );
+    }
+
+    private CustomUserDetails createUser(String username) {
+
+        Role role = Role.builder()
+                .name("ROLE_ADMIN")
+                .build();
+
+        Employee employee = Employee.builder()
+                .username(username)
+                .password("password")
+                .enabled(true)
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .roles(Set.of(role))
+                .build();
+
+        return new CustomUserDetails(employee);
     }
 }

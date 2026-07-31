@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT}
 
 spring:
   application:
@@ -11,14 +11,14 @@ spring:
         webmvc:
           routes:
             - id: identity-service
-              uri: lb://IDENTITY-SERVICE
+              uri: lb://identity-service
               predicates:
                 - Path=/identity/**
               filters:
                 - StripPrefix=1
 
             - id: audit-service
-              uri: lb://AUDIT-SERVICE
+              uri: lb://audit-service
               predicates:
                 - Path=/audit/**
               filters:
@@ -27,7 +27,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_SERVER_URL}
     register-with-eureka: true
     fetch-registry: true
 

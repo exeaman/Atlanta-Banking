@@ -14,7 +14,9 @@ import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyDi
 import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyEnabledException;
 import com.atlanta.banking.identity.service.exception.employee.EmployeeAlreadyTerminatedException;
 import com.atlanta.banking.identity.service.exception.role.InvalidRoleAssignmentException;
+import com.atlanta.banking.identity.service.mapper.EmployeeEventMapper;
 import com.atlanta.banking.identity.service.mapper.EmployeeMapper;
+import com.atlanta.banking.identity.service.producer.EmployeeEventProducer;
 import com.atlanta.banking.identity.service.repository.EmployeeRepository;
 import com.atlanta.banking.identity.service.repository.RoleRepository;
 import com.atlanta.banking.identity.service.services.employee.impl.EmployeeServiceImpl;
@@ -54,7 +56,13 @@ class EmployeeServiceTest {
     private EmployeeMapper employeeMapper;
 
     @Mock
+    private EmployeeEventProducer employeeEventProducer;
+
+    @Mock
     private EmployeeIdGenerator employeeIdGenerator;
+
+    @Mock
+    private EmployeeEventMapper employeeEventMapper;
 
     @Mock
     private UsernameGenerator usernameGenerator;

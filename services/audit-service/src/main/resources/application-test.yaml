@@ -1,18 +1,16 @@
+server:
+  port: 0
+
 spring:
   datasource:
-    url: jdbc:h2:mem:auditdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/audit_test}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
   kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: audit-service
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -21,15 +19,15 @@ spring:
 
     properties:
       hibernate:
-        format_sql: true
+        default_schema: audit
 
 eureka:
   client:
     enabled: false
 
+jwt:
+  secret: TestSecretKeyForJUnitOnly
+
 logging:
   level:
     root: WARN
-
-jwt:
-  secret: test-secret-key

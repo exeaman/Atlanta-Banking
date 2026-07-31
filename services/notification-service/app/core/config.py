@@ -1,53 +1,28 @@
-from functools import lru_cache
+from os import getenv
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+PROFILE = getenv("PROFILE", "local")
+
+ROOT_DIR = Path(__file__).resolve().parents[4]
+
 
 class Settings(BaseSettings):
-    app_name: str = "Atlanta Notification Service"
-    app_version: str = "1.0.0"
-    environment: str = "dev"
+    SERVER_PORT: int
 
-    host: str = "127.0.0.1"
-    port: int = 8000
+    DATABASE_URL: str
 
-    postgres_host: str = "localhost"
-    postgres_port: int = 5432
-    postgres_database: str = "notification_db"
-    postgres_username: str = "postgres"
-    postgres_password: str = "postgres"
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_EMPLOYEE_TOPIC: str
+    KAFKA_CONSUMER_GROUP: str
 
-    kafka_bootstrap_servers: str = "localhost:9092"
-
-    smtp_host: str = "localhost"
-    smtp_port: int = 1025
-    smtp_username: str = ""
-    smtp_password: str = ""
-    smtp_starttls: bool = True
-    smtp_timeout: int = 10
-    smtp_sender: str = ""
+    EUREKA_SERVER_URL: str
 
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
+        env_file=ROOT_DIR / "config" / PROFILE / "notification.env",
+        extra="ignore",
     )
-    log_level: str = "DEBUG"
-    @property
-    def database_url(self) -> str:
-        return (
-            f"postgresql+psycopg://"
-            f"{self.postgres_username}:"
-            f"{self.postgres_password}@"
-            f"{self.postgres_host}:"
-            f"{self.postgres_port}/"
-            f"{self.postgres_database}"
-        )
 
 
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-
-
-settings = get_settings()
+settings = Settings()

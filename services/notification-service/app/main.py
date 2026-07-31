@@ -1,34 +1,48 @@
 from contextlib import asynccontextmanager
+import asyncio
 
 from fastapi import FastAPI
 
-from app.api.health import router as health_router
-from app.api.notification_controller import router as notification_router
-from app.core.config import settings
-from app.core.logging import configure_logging
-from app.database.base import Base
-from app.database.database import engine
-from app.exceptions.global_exception_handler import register_exception_handlers
+from app import api
+from app.api import health
+from app.consumers.employee_created_consumer import EmployeeCreatedConsumer
+from app.core.config import settings, PROFILE
+from app.core.dependencies import get_notification_service
+from app.database.initializer import initialize_database
+from app.database.session import SessionLocal
 
-configure_logging()
-
+#if PROFILE == "local":
+#    initialize_database()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    db = SessionLocal()
+
+    service = get_notification_service(db)
+
+    consumer = EmployeeCreatedConsumer(
+        bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+        topic=settings.KAFKA_EMPLOYEE_TOPIC,
+        group_id=settings.KAFKA_CONSUMER_GROUP,
+        notification_service=service,
+    )
+
+    task = asyncio.create_task(
+        consumer.start()
+    )
 
     yield
 
+    await consumer.stop()
+
+    task.cancel()
+
+    db.close()
+
 
 app = FastAPI(
-    title=settings.app_name,
-    version=settings.app_version,
-    lifespan=lifespan,
+    lifespan=lifespan
 )
 
-register_exception_handlers(app)
-
-app.include_router(health_router)
-app.include_router(notification_router)
+# api.include_router(health.router)

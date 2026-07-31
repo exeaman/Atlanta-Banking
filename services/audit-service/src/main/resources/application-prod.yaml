@@ -1,14 +1,15 @@
 server:
-  port: ${SERVER_PORT:8088}
+  port: ${SERVER_PORT}
 
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: audit-service
       auto-offset-reset: earliest
@@ -16,28 +17,33 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-
     hibernate:
       ddl-auto: validate
-
     show-sql: false
-
     properties:
       hibernate:
-        format_sql: false
         default_schema: audit
 
 eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: ${EUREKA_SERVER}
+      defaultZone: ${EUREKA_SERVER_URL}
     register-with-eureka: true
     fetch-registry: true
 
+jwt:
+  secret: ${JWT_SECRET}
+
 management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
   endpoint:
     health:
       show-details: never
@@ -46,6 +52,3 @@ logging:
   level:
     root: WARN
     com.atlantabanking.audit: INFO
-
-jwt:
-  secret: ${JWT_SECRET}

@@ -1,15 +1,15 @@
 server:
-  port: 8088
+  port: ${SERVER_PORT}
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/audit_db
-    username: postgres
-    password: postgres
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: audit-service
       auto-offset-reset: earliest
@@ -19,6 +19,7 @@ spring:
         spring.json.value.default.type: java.util.LinkedHashMap
         spring.json.use.type.headers: false
         spring.json.trusted.packages: com.atlanta.banking.identity.service.event
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -33,12 +34,12 @@ eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_SERVER_URL}
     register-with-eureka: true
     fetch-registry: false
 
 jwt:
-  secret: CHANGE_ME_TO_YOUR_SECRET
+  secret: ${JWT_SECRET}
 
 management:
   endpoints:
@@ -50,6 +51,9 @@ management:
       show-details: always
 
 logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p){highlight} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %m%n"
+
   level:
     root: INFO
     com.atlantabanking.audit: DEBUG

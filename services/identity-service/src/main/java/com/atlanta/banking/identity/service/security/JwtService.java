@@ -28,12 +28,23 @@ public class JwtService {
     }
 
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(CustomUserDetails principal) {
 
-        CustomUserDetails principal = (CustomUserDetails) userDetails;
         Instant now = Instant.now();
 
-        return Jwts.builder().subject(principal.employee().getUsername()).issuer("identity-service").audience().add("atlanta-banking").and().id(UUID.randomUUID().toString()).claim("username", principal.getUsername()).claim("roles", principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()).issuedAt(Date.from(now)).expiration(Date.from(now.plusMillis(jwtExpiration))).signWith(signingKey).compact();
+        return Jwts.builder()
+                .subject(principal.getUsername())
+                .issuer("identity-service")
+                .audience().add("atlanta-banking").and()
+                .id(UUID.randomUUID().toString())
+                .claim("username", principal.getUsername())
+                .claim("roles", principal.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(jwtExpiration)))
+                .signWith(signingKey)
+                .compact();
     }
 
     public String extractUsername(String token) {
